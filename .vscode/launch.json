@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(msvc) Launch Cross Compile",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\bin\\windows\\test.exe",
+            "cwd": "${workspaceFolder}\\bin\\windows\\",
+            "preLaunchTask": "(Linux) Cross-compile the example exe"
+        },
+        {
+            "name": "Just runit",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}\\bin\\windows\\test.exe",
+        }
+    ]
+}

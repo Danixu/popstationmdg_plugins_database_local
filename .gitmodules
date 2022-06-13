@@ -1,0 +1,6 @@
+[submodule "thirdparty/sqlite"]
+	path = thirdparty/sqlite
+	url = git@github.com:sqlite/sqlite.git
+[submodule "thirdparty/popstationmdg"]
+	path = thirdparty/popstationmdg
+	url = git@github.com:Danixu/popstationmdg.git

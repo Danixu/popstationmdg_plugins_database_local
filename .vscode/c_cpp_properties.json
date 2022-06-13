@@ -1,0 +1,68 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/thirdparty/sqlite/*",
+                "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+            ],
+            "defines": [
+                "__WXOSX_COCOA__",
+                "__WXMAC__",
+                "__WXOSX__"
+            ],
+            "macFrameworkPath": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "Windows",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/thirdparty/sqlite/*",
+                "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+            ],
+            "defines": [
+                "__WXMSW__",
+                "_UNICODE",
+                "_DEBUG",
+                "BUILD_LIB"
+            ],
+            "compilerPath": "cl.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/thirdparty/sqlite/*",
+                "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+            ],
+            "defines": [
+                "__WXGTK__"
+            ],
+            "compilerPath": "g++",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerArgs": [],
+            "mergeConfigurations": true,
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/include/*",
+                    "${workspaceFolder}/thirdparty/sqlite/*",
+                    "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+                    
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}
