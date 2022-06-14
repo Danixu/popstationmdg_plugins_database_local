@@ -9,7 +9,7 @@ mkdir -p bin/linux
 #################
 # Linux version #
 #################
-
+: '
 # Compile the library
 echo "Compiling the Linux version"
 # Compile the library
@@ -50,7 +50,7 @@ g++ \
   \
   -o bin/linux/test
 cp data/test.db bin/linux/test.db
-
+'
 
 
 

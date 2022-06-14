@@ -50,15 +50,28 @@ int main()
 
         // Get the game ID
         fprintf(stderr, "Getting the Title by ID\n");
-        std::string id_test = ph->getTitleByID("SCES03884");
-        if (id_test.c_str() == "")
+        std::string title_id_test = ph->getTitleByID("SCES03884");
+        if (title_id_test.c_str() == "")
         {
             fprintf(stderr, "Error: %s\n", ph->getError().c_str());
             return 1;
         }
         else
         {
-            fprintf(stderr, "%s\n", id_test.c_str());
+            fprintf(stderr, "%s\n", title_id_test.c_str());
+        }
+
+        // Get the game Region
+        fprintf(stderr, "Getting the Region by ID\n");
+        std::string region_id_test = ph->getRegionByID("SCES03884");
+        if (region_id_test.c_str() == "")
+        {
+            fprintf(stderr, "Error: %s\n", ph->getError().c_str());
+            return 1;
+        }
+        else
+        {
+            fprintf(stderr, "%s\n", region_id_test.c_str());
         }
 
         // Close the file

@@ -64,6 +64,26 @@ const char *LocalSQlite::getTitleByID(const char *gameID)
     }
 }
 
+const char *LocalSQlite::getRegionByID(const char *gameID)
+{
+    // char *sql;
+
+    /* Create SQL statement */
+    std::string sql = "SELECT region from games WHERE id = '" + std::string(gameID) + "';";
+
+    /* Execute SQL statement */
+    returnCode = sqlite3_exec(database, sql.c_str(), callback, &gameRegion, &last_error);
+
+    if (returnCode != SQLITE_OK)
+    {
+        return NULL;
+    }
+    else
+    {
+        return gameRegion.c_str();
+    }
+}
+
 // Close the ISO file (if was opened)
 bool LocalSQlite::close()
 {
@@ -138,7 +158,7 @@ extern "C"
     //
     unsigned int SHARED_EXPORT getType()
     {
-        return PTTitleDatabase;
+        return PTGameDatabase;
     }
 
     //
@@ -177,6 +197,13 @@ extern "C"
         LocalSQlite *object = (LocalSQlite *)handler;
 
         return object->getTitleByID(gameID);
+    }
+
+    const char SHARED_EXPORT *getRegionByID(void *handler, const char *gameID)
+    {
+        LocalSQlite *object = (LocalSQlite *)handler;
+
+        return object->getRegionByID(gameID);
     }
 
     bool SHARED_EXPORT isOK(void *handler)
