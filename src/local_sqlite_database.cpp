@@ -87,7 +87,11 @@ const char *LocalSQlite::getRegionByID(const char *gameID)
 // Close the ISO file (if was opened)
 bool LocalSQlite::close()
 {
-    sqlite3_close(database);
+    if (database != NULL)
+    {
+        sqlite3_close_v2(database);
+        database = NULL;
+    }
     return true;
 }
 
