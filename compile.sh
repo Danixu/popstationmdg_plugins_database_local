@@ -9,7 +9,7 @@ mkdir -p bin/linux
 #################
 # Linux version #
 #################
-: '
+
 # Compile the library
 echo "Compiling the Linux version"
 # Compile the library
@@ -42,15 +42,13 @@ g++ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
   thirdparty/popstationmdg/src/logger/logger.cpp \
-  thirdparty/popstationmdg/src/plugins/plugin_handler_common.cpp \
-  thirdparty/popstationmdg/src/plugins/plugin_handler_database.cpp \
+  thirdparty/popstationmdg/src/plugins/plugin_handler.cpp \
   src/test.cpp \
   \
   -static-libgcc -static-libstdc++ -std=c++17 -ldl -pthread \
   \
   -o bin/linux/test
 cp data/test.db bin/linux/test.db
-'
 
 
 
@@ -89,8 +87,7 @@ x86_64-w64-mingw32-g++ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
   thirdparty/popstationmdg/src/logger/logger.cpp \
-  thirdparty/popstationmdg/src/plugins/plugin_handler_common.cpp \
-  thirdparty/popstationmdg/src/plugins/plugin_handler_database.cpp \
+  thirdparty/popstationmdg/src/plugins/plugin_handler.cpp \
   src/test.cpp \
   \
   -static-libgcc -static-libstdc++ -std=c++17 \

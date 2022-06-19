@@ -1,15 +1,17 @@
 #include "local_sqlite_database.hpp"
 
-int callback(void *data, int argc, char **argv, char **azColName)
+int dataInsert(void *data, int argc, char **argv, char **azColName)
 {
-    std::string *gameTitle = (std::string *)data;
-    if (argc > 0 && argv[0])
+    std::map<std::string, std::string> *gameData = (std::map<std::string, std::string> *)data;
+    for (size_t i = 0; i < argc; i++)
     {
-        size_t length = strlen(argv[0]);
-
-        gameTitle->assign(argv[0]);
+        gameData->insert({std::string(azColName[i]), std::string(argv[i])});
     }
 
+    for (auto it = gameData->begin(); it != gameData->end(); it++)
+    {
+        fprintf(stderr, "Item key = %s - Item value = %s\n", it->first.c_str(), it->second.c_str());
+    }
     return 0;
 }
 
@@ -21,20 +23,25 @@ LocalSQlite::LocalSQlite()
 // Reader destructor
 LocalSQlite::~LocalSQlite()
 {
-    // Clear the last error
+    // Clear the last returned value string
+    if (last_returned_value != NULL)
+    {
+        delete[] last_returned_value;
+    }
+
+    // Clear the last error string
     if (last_error != NULL)
     {
         delete[] last_error;
-        last_error = NULL;
     }
 
     close();
 }
 
 // Open the ISO file
-bool LocalSQlite::openDatabase(const char *filename)
+bool LocalSQlite::openDatabase(std::string filename)
 {
-    returnCode = sqlite3_open_v2(filename, &database, SQLITE_OPEN_READONLY, NULL);
+    returnCode = sqlite3_open_v2(filename.c_str(), &database, SQLITE_OPEN_READONLY, NULL);
     if (returnCode)
     {
         setLastError(std::string("There was an error opening the database file"));
@@ -44,43 +51,50 @@ bool LocalSQlite::openDatabase(const char *filename)
     return true;
 }
 
-const char *LocalSQlite::getTitleByID(const char *gameID)
+char *LocalSQlite::getGameData(std::string gameID, std::string value)
 {
-    // char *sql;
-
-    /* Create SQL statement */
-    std::string sql = "SELECT title from games WHERE id = '" + std::string(gameID) + "';";
-
-    /* Execute SQL statement */
-    returnCode = sqlite3_exec(database, sql.c_str(), callback, &gameTitle, &last_error);
-
-    if (returnCode != SQLITE_OK)
+    if (last_id != gameID)
     {
-        return NULL;
+        /* Create SQL statement */
+        std::string sql = "SELECT title, region from games WHERE id = '" + gameID + "';";
+        char *error = NULL;
+
+        /* Execute SQL statement */
+        returnCode = sqlite3_exec(database, sql.c_str(), dataInsert, &gameData, &error);
+
+        if (returnCode != SQLITE_OK)
+        {
+            if (error != NULL)
+            {
+                setLastError(std::string("There was an error doing the sql query: ") + std::string(error));
+            }
+            else
+            {
+                setLastError(std::string("There was an error doing the sql query"));
+            }
+
+            return NULL;
+        }
+    }
+
+    last_id = gameID;
+    auto found = gameData.find(value);
+    if (found != gameData.end())
+    {
+        if (last_returned_value != NULL)
+        {
+            delete[] last_returned_value;
+        }
+        size_t value_length = found->second.length() + 1;
+        last_returned_value = new char[value_length];
+        memset(last_returned_value, 0, value_length);
+
+        strncpy_s(last_returned_value, value_length, found->second.c_str(), found->second.length());
+        return last_returned_value;
     }
     else
     {
-        return gameTitle.c_str();
-    }
-}
-
-const char *LocalSQlite::getRegionByID(const char *gameID)
-{
-    // char *sql;
-
-    /* Create SQL statement */
-    std::string sql = "SELECT region from games WHERE id = '" + std::string(gameID) + "';";
-
-    /* Execute SQL statement */
-    returnCode = sqlite3_exec(database, sql.c_str(), callback, &gameRegion, &last_error);
-
-    if (returnCode != SQLITE_OK)
-    {
         return NULL;
-    }
-    else
-    {
-        return gameRegion.c_str();
     }
 }
 
@@ -110,33 +124,41 @@ char *LocalSQlite::getError()
 // Clear the last error and isOK status
 void LocalSQlite::clearError()
 {
-    delete[] last_error;
     last_error = NULL;
     is_ok = true;
 }
 
 void LocalSQlite::setLastError(std::string error)
 {
-    if (error.length() > 0)
+    size_t value_length = error.length() + 1;
+    // If string is not empty
+    if (value_length > 1)
     {
-        char *error_char = new char[error.length() + 1];
-        std::memset(error_char, 0, error.length() + 1);
-        strncpy_s(error_char, error.length() + 1, error.c_str(), error.length());
-        setLastError(error_char);
+        if (last_error != NULL)
+        {
+            delete[] last_error;
+        }
+
+        last_error = new char[value_length];
+        memset(last_error, 0, value_length);
+
+        strncpy_s(last_error, value_length, error.c_str(), error.length());
     }
 }
 
 // Set the last error text and isOK to false
 void LocalSQlite::setLastError(char *error)
 {
-    if (last_error != NULL)
+    if (error != NULL)
     {
-        delete[] last_error;
-        last_error = NULL;
-    }
+        if (last_error != NULL)
+        {
+            delete[] last_error;
+        }
 
-    last_error = error;
-    is_ok = false;
+        last_error = error;
+        is_ok = false;
+    }
 }
 
 extern "C"
@@ -170,7 +192,7 @@ extern "C"
     //
     const char SHARED_EXPORT *getPluginName()
     {
-        return "ISO Image";
+        return "Local SQLite Database";
     }
 
     //
@@ -196,18 +218,11 @@ extern "C"
     }
 
     // ISO Images doesn't have any information about title
-    const char SHARED_EXPORT *getTitleByID(void *handler, const char *gameID)
+    char SHARED_EXPORT *getGameData(void *handler, const char *gameID, const char *value)
     {
         LocalSQlite *object = (LocalSQlite *)handler;
 
-        return object->getTitleByID(gameID);
-    }
-
-    const char SHARED_EXPORT *getRegionByID(void *handler, const char *gameID)
-    {
-        LocalSQlite *object = (LocalSQlite *)handler;
-
-        return object->getRegionByID(gameID);
+        return object->getGameData(gameID, value);
     }
 
     bool SHARED_EXPORT isOK(void *handler)

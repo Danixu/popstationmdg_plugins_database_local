@@ -5,6 +5,7 @@
 */
 
 #include <string>
+#include <map>
 #include <vector>
 #include <memory>
 #include <iostream>
@@ -32,18 +33,18 @@ public:
     void clearError(); // Clear the las error.
 
     // Database
-    bool openDatabase(const char *filename);       // Open the source/destination file
-    const char *getTitleByID(const char *gameID);  // Return the total disks in this input/output file
-    const char *getRegionByID(const char *gameID); // Return the total disks in this input/output file
+    bool openDatabase(std::string filename);                  // Open the source/destination file
+    char *getGameData(std::string gameID, std::string value); // Return the total disks in this input/output file
 
 protected:
     // SQLite 3 object
-    sqlite3 *database;
+    sqlite3 *database = NULL;
     int returnCode;
 
-    // Title
-    std::string gameTitle = "";
-    std::string gameRegion = "";
+    // gameDataVariables
+    std::map<std::string, std::string> gameData;
+    std::string last_id = "";
+    char *last_returned_value = NULL;
 
     // Error management
     void setLastError(std::string error);
@@ -61,13 +62,12 @@ extern "C"
     const char SHARED_EXPORT *getPluginName();
     const char SHARED_EXPORT *getPluginVersion();
 
-    bool SHARED_EXPORT close(void *handler);                                    // The plugin must flush, write, cleanup... when this method is called
-    bool SHARED_EXPORT isOK(void *handler);                                     // Method to check if the plugin have any error
-    char SHARED_EXPORT *getError(void *handler);                                // Get the last error string. Will be empty if there was no errors.
-    void SHARED_EXPORT clearError(void *handler);                               // Clear the las error.
-    bool SHARED_EXPORT openDatabase(void *handler, const char *filename);       // Open the source file
-    const char SHARED_EXPORT *getTitleByID(void *handler, const char *gameID);  // Get the Game Title from the ID
-    const char SHARED_EXPORT *getRegionByID(void *handler, const char *gameID); // Get the Game Title from the ID
+    bool SHARED_EXPORT close(void *handler);                                               // The plugin must flush, write, cleanup... when this method is called
+    bool SHARED_EXPORT isOK(void *handler);                                                // Method to check if the plugin have any error
+    char SHARED_EXPORT *getError(void *handler);                                           // Get the last error string. Will be empty if there was no errors.
+    void SHARED_EXPORT clearError(void *handler);                                          // Clear the las error.
+    bool SHARED_EXPORT openDatabase(void *handler, const char *filename);                  // Open the source file
+    char SHARED_EXPORT *getGameData(void *handler, const char *gameID, const char *value); // Get the Game Title from the ID
 }
 
 #endif // _PLUGIN_HPP_H_

@@ -15,7 +15,6 @@
 
 int main()
 {
-
     auto plugins = load_plugins("./", EXT);
     for (auto ph : plugins)
     {
@@ -37,7 +36,7 @@ int main()
         if (!ph->isOK())
         {
             fprintf(stderr, "Error: %s\n", ph->getError().c_str());
-            return 1;
+            continue;
         }
 
         fprintf(stderr, "Opening database file\n");
@@ -45,16 +44,16 @@ int main()
         if (!opened)
         {
             fprintf(stderr, "Error: %s\n", ph->getError().c_str());
-            return 1;
+            continue;
         }
 
         // Get the game ID
         fprintf(stderr, "Getting the Title by ID\n");
-        std::string title_id_test = ph->getTitleByID("SCES03884");
+        std::string title_id_test = ph->getGameData("SCES03884", "title");
         if (title_id_test.c_str() == "")
         {
             fprintf(stderr, "Error: %s\n", ph->getError().c_str());
-            return 1;
+            continue;
         }
         else
         {
@@ -63,11 +62,11 @@ int main()
 
         // Get the game Region
         fprintf(stderr, "Getting the Region by ID\n");
-        std::string region_id_test = ph->getRegionByID("SCES03884");
+        std::string region_id_test = ph->getGameData("SCES03884", "region");
         if (region_id_test.c_str() == "")
         {
             fprintf(stderr, "Error: %s\n", ph->getError().c_str());
-            return 1;
+            continue;
         }
         else
         {
