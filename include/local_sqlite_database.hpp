@@ -27,14 +27,14 @@ public:
     ~LocalSQlite();
 
     // Common
-    bool close();      // The plugin must flush, write, cleanup... when this method is called
-    bool isOK();       // Method to check if the plugin have any error
-    char *getError();  // Get the last error string. Will be empty if there was no errors.
-    void clearError(); // Clear the las error.
+    bool close();                                              // The plugin must flush, write, cleanup... when this method is called
+    bool isOK();                                               // Method to check if the plugin have any error
+    bool getError(char *error, unsigned long long buffersize); // Get the last error string. Will be empty if there was no errors.
+    void clearError();                                         // Clear the las error.
 
     // Database
-    bool openDatabase(std::string filename);                  // Open the source/destination file
-    char *getGameData(std::string gameID, std::string value); // Return the total disks in this input/output file
+    bool openDatabase(std::string filename);                                                                    // Open the source/destination file
+    bool getGameData(const char *gameID, const char *value, char *return_value, unsigned long long buffersize); // Return the total disks in this input/output file
 
 protected:
     // SQLite 3 object
@@ -44,7 +44,6 @@ protected:
     // gameDataVariables
     std::map<std::string, std::string> gameData;
     std::string last_id = "";
-    char *last_returned_value = NULL;
 
     // Error management
     void setLastError(std::string error);
@@ -59,15 +58,15 @@ extern "C"
     void SHARED_EXPORT *load();
     void SHARED_EXPORT unload(void *ptr);
     unsigned int SHARED_EXPORT getType();
-    const char SHARED_EXPORT *getPluginName();
-    const char SHARED_EXPORT *getPluginVersion();
+    bool SHARED_EXPORT getPluginName(char *name, unsigned long long buffersize);
+    bool SHARED_EXPORT getPluginVersion(char *version, unsigned long long buffersize);
 
-    bool SHARED_EXPORT close(void *handler);                                               // The plugin must flush, write, cleanup... when this method is called
-    bool SHARED_EXPORT isOK(void *handler);                                                // Method to check if the plugin have any error
-    char SHARED_EXPORT *getError(void *handler);                                           // Get the last error string. Will be empty if there was no errors.
-    void SHARED_EXPORT clearError(void *handler);                                          // Clear the las error.
-    bool SHARED_EXPORT openDatabase(void *handler, const char *filename);                  // Open the source file
-    char SHARED_EXPORT *getGameData(void *handler, const char *gameID, const char *value); // Get the Game Title from the ID
+    bool SHARED_EXPORT close(void *handler);                                                                                                 // The plugin must flush, write, cleanup... when this method is called
+    bool SHARED_EXPORT isOK(void *handler);                                                                                                  // Method to check if the plugin have any error
+    bool SHARED_EXPORT getError(void *handler, char *error, unsigned long long buffersize);                                                  // Get the last error string. Will be empty if there was no errors.
+    void SHARED_EXPORT clearError(void *handler);                                                                                            // Clear the las error.
+    bool SHARED_EXPORT openDatabase(void *handler, const char *filename);                                                                    // Open the source file
+    bool SHARED_EXPORT getGameData(void *handler, const char *gameID, const char *value, char *return_value, unsigned long long buffersize); // Get the Game Title from the ID
 }
 
 #endif // _PLUGIN_HPP_H_

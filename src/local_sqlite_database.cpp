@@ -23,12 +23,6 @@ LocalSQlite::LocalSQlite()
 // Reader destructor
 LocalSQlite::~LocalSQlite()
 {
-    // Clear the last returned value string
-    if (last_returned_value != NULL)
-    {
-        delete[] last_returned_value;
-    }
-
     // Clear the last error string
     if (last_error != NULL)
     {
@@ -51,12 +45,14 @@ bool LocalSQlite::openDatabase(std::string filename)
     return true;
 }
 
-char *LocalSQlite::getGameData(std::string gameID, std::string value)
+bool LocalSQlite::getGameData(const char *gameID, const char *value, char *return_value, unsigned long long buffersize)
 {
-    if (last_id != gameID)
+    std::string game_id = gameID;
+
+    if (last_id != game_id)
     {
         /* Create SQL statement */
-        std::string sql = "SELECT title, region from games WHERE id = '" + gameID + "';";
+        std::string sql = "SELECT * from games WHERE serial = '" + game_id + "';";
         char *error = NULL;
 
         /* Execute SQL statement */
@@ -81,16 +77,19 @@ char *LocalSQlite::getGameData(std::string gameID, std::string value)
     auto found = gameData.find(value);
     if (found != gameData.end())
     {
-        if (last_returned_value != NULL)
-        {
-            delete[] last_returned_value;
-        }
         size_t value_length = found->second.length() + 1;
-        last_returned_value = new char[value_length];
-        memset(last_returned_value, 0, value_length);
-
-        strncpy_s(last_returned_value, value_length, found->second.c_str(), found->second.length());
-        return last_returned_value;
+        if (value_length > buffersize)
+        {
+            return false;
+        }
+        if (strncpy_s(return_value, buffersize, found->second.c_str(), found->second.length()))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
     else
     {
@@ -116,9 +115,22 @@ bool LocalSQlite::isOK()
 }
 
 // Get the last error
-char *LocalSQlite::getError()
+bool LocalSQlite::getError(char *error, unsigned long long buffersize)
 {
-    return last_error;
+    if (strlen(last_error) > buffersize)
+    {
+        setLastError(std::string("The output buffer size is too small"));
+        return false;
+    }
+
+    if (strncpy_s(error, buffersize, last_error, strlen(last_error)))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 // Clear the last error and isOK status
@@ -128,6 +140,7 @@ void LocalSQlite::clearError()
     is_ok = true;
 }
 
+// Set the last error text and isOK to false
 void LocalSQlite::setLastError(std::string error)
 {
     size_t value_length = error.length() + 1;
@@ -144,21 +157,8 @@ void LocalSQlite::setLastError(std::string error)
 
         strncpy_s(last_error, value_length, error.c_str(), error.length());
     }
-}
 
-// Set the last error text and isOK to false
-void LocalSQlite::setLastError(char *error)
-{
-    if (error != NULL)
-    {
-        if (last_error != NULL)
-        {
-            delete[] last_error;
-        }
-
-        last_error = error;
-        is_ok = false;
-    }
+    is_ok = false;
 }
 
 extern "C"
@@ -190,17 +190,47 @@ extern "C"
     //
     // Return the plugin name
     //
-    const char SHARED_EXPORT *getPluginName()
+    bool SHARED_EXPORT getPluginName(char *name, unsigned long long buffersize)
     {
-        return "Local SQLite Database";
+        // Compatible extensions for the reader/writter. Use pipe "|" between the extension: "*.iso|*.bin"
+        const char pn[] = "Local SQLite Database";
+
+        if (sizeof(pn) > buffersize)
+        {
+            return false;
+        }
+
+        if (strncpy_s(name, buffersize, pn, sizeof(pn)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     //
     // Return the plugin version
     //
-    const char SHARED_EXPORT *getPluginVersion()
+    bool SHARED_EXPORT getPluginVersion(char *version, unsigned long long buffersize)
     {
-        return "0.0.1";
+        // Compatible extensions for the reader/writter. Use pipe "|" between the extension: "*.iso|*.bin"
+        const char pv[] = "0.0.1";
+
+        if (sizeof(pv) > buffersize)
+        {
+            return false;
+        }
+
+        if (strncpy_s(version, buffersize, pv, sizeof(pv)))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     bool SHARED_EXPORT openDatabase(void *handler, const char *filename)
@@ -218,11 +248,11 @@ extern "C"
     }
 
     // ISO Images doesn't have any information about title
-    char SHARED_EXPORT *getGameData(void *handler, const char *gameID, const char *value)
+    bool SHARED_EXPORT getGameData(void *handler, const char *gameID, const char *value, char *return_value, unsigned long long buffersize)
     {
         LocalSQlite *object = (LocalSQlite *)handler;
 
-        return object->getGameData(gameID, value);
+        return object->getGameData(gameID, value, return_value, buffersize);
     }
 
     bool SHARED_EXPORT isOK(void *handler)
@@ -232,11 +262,11 @@ extern "C"
         return object->isOK();
     }
 
-    char SHARED_EXPORT *getError(void *handler)
+    bool SHARED_EXPORT getError(void *handler, char *error, unsigned long long buffersize)
     {
         LocalSQlite *object = (LocalSQlite *)handler;
 
-        return object->getError();
+        return object->getError(error, buffersize);
     }
 
     void SHARED_EXPORT clearError(void *handler)
