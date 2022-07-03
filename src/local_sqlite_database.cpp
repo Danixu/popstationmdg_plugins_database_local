@@ -32,17 +32,23 @@ LocalSQlite::~LocalSQlite()
     close();
 }
 
-// Open the ISO file
-bool LocalSQlite::openDatabase(std::string filename)
+// Open the database file
+bool LocalSQlite::open(std::string filename, unsigned int mode, unsigned int threads)
 {
-    returnCode = sqlite3_open_v2(filename.c_str(), &database, SQLITE_OPEN_READONLY, NULL);
-    if (returnCode)
+    if (mode & PTGameDatabase)
     {
-        setLastError(std::string("There was an error opening the database file"));
-        return false;
+        returnCode = sqlite3_open_v2("./local_sqlite_database.db", &database, SQLITE_OPEN_READONLY, NULL);
+        if (returnCode)
+        {
+            setLastError(std::string("There was an error opening the database file"));
+            return false;
+        }
+
+        return true;
     }
 
-    return true;
+    setLastError(std::string("The open mode is not correct."));
+    return false;
 }
 
 bool LocalSQlite::getGameData(const char *gameID, const char *value, char *return_value, unsigned long long buffersize)
@@ -82,14 +88,9 @@ bool LocalSQlite::getGameData(const char *gameID, const char *value, char *retur
         {
             return false;
         }
-        if (strncpy_s(return_value, buffersize, found->second.c_str(), found->second.length()))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        strncpy_s(return_value, buffersize, found->second.c_str(), found->second.length());
+
+        return true;
     }
     else
     {
@@ -97,7 +98,7 @@ bool LocalSQlite::getGameData(const char *gameID, const char *value, char *retur
     }
 }
 
-// Close the ISO file (if was opened)
+// Close the DB file (if was opened)
 bool LocalSQlite::close()
 {
     if (database != NULL)
@@ -115,21 +116,25 @@ bool LocalSQlite::isOK()
 }
 
 // Get the last error
+// Get the last error
 bool LocalSQlite::getError(char *error, unsigned long long buffersize)
 {
-    if (strlen(last_error) > buffersize)
+    if (last_error != NULL)
     {
-        setLastError(std::string("The output buffer size is too small"));
-        return false;
-    }
+        size_t error_size = strlen(last_error);
+        if (error_size > buffersize)
+        {
+            setLastError(std::string("The output buffer size is too small"));
+            return false;
+        }
 
-    if (strncpy_s(error, buffersize, last_error, strlen(last_error)))
-    {
+        strncpy_s(error, buffersize, last_error, error_size);
+
         return true;
     }
     else
     {
-        return false;
+        return true;
     }
 }
 
@@ -200,14 +205,8 @@ extern "C"
             return false;
         }
 
-        if (strncpy_s(name, buffersize, pn, sizeof(pn)))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        strncpy_s(name, buffersize, pn, sizeof(pn));
+        return true;
     }
 
     //
@@ -223,21 +222,16 @@ extern "C"
             return false;
         }
 
-        if (strncpy_s(version, buffersize, pv, sizeof(pv)))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        strncpy_s(version, buffersize, pv, sizeof(pv));
+
+        return true;
     }
 
-    bool SHARED_EXPORT openDatabase(void *handler, const char *filename)
+    bool SHARED_EXPORT open(void *handler, char *filename, unsigned int mode, unsigned int threads)
     {
         LocalSQlite *object = (LocalSQlite *)handler;
 
-        return object->openDatabase(filename);
+        return object->open(filename, mode, threads);
     }
 
     bool SHARED_EXPORT close(void *handler)

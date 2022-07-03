@@ -38,17 +38,18 @@ g++ \
   -g \
   -Iinclude \
   -Ithirdparty/popstationmdg/src/plugins/ \
+  -Ithirdparty/popstationmdg/src/logger/ \
   -Ithirdparty/sqlite/ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
-  thirdparty/popstationmdg/src/logger/logger.cpp \
+  thirdparty/popstationmdg/src/logger/Logger.cpp \
   thirdparty/popstationmdg/src/plugins/plugin_handler.cpp \
   src/test.cpp \
   \
   -static-libgcc -static-libstdc++ -std=c++17 -ldl -pthread \
   \
   -o bin/linux/test
-cp data/test.db bin/linux/test.db
+cp data/test.db bin/linux/local_sqlite_database.db
 
 
 
@@ -83,14 +84,15 @@ x86_64-w64-mingw32-g++ \
   -g \
   -Iinclude \
   -Ithirdparty/popstationmdg/src/plugins/ \
+  -Ithirdparty/popstationmdg/src/logger/ \
   -Ithirdparty/sqlite/ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
-  thirdparty/popstationmdg/src/logger/logger.cpp \
+  thirdparty/popstationmdg/src/logger/Logger.cpp \
   thirdparty/popstationmdg/src/plugins/plugin_handler.cpp \
   src/test.cpp \
   \
   -static-libgcc -static-libstdc++ -std=c++17 \
   \
   -o bin/windows/test.exe
-cp data/test.db bin/windows/test.db
+cp data/test.db bin/windows/local_sqlite_database.db

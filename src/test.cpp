@@ -13,9 +13,11 @@
 #define EXT ".so"
 #endif
 
+Logging::Logger pLogger = Logging::Logger(Logging::LOG_IN_FILE, Logging::LOG_LEVEL_WARNING, std::string("./test_database.log"));
+
 int main()
 {
-    auto plugins = load_plugins("./", EXT);
+    auto plugins = load_plugins("./", EXT, PTGameDatabase);
     for (auto ph : plugins)
     {
         fprintf(stderr, "Loading plugin...\n");
@@ -40,7 +42,7 @@ int main()
         }
 
         fprintf(stderr, "Opening database file\n");
-        bool opened = ph->openDatabase("test.db");
+        bool opened = ph->open("", PTGameDatabase);
         if (!opened)
         {
             fprintf(stderr, "Error: %s\n", ph->getError().c_str());
