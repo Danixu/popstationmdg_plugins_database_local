@@ -14,18 +14,19 @@
 #include <filesystem>
 
 #include "export.h"
+#include "Logger.h"
 #include "plugin_assistant.hpp"
 #include "sqlite3.h"
 
 #ifndef _PLUGIN_HPP_H_
 #define _PLUGIN_HPP_H_
 
-class LocalSQlite
+class LocalSQLite
 {
 public:
     // Constructor and destructor
-    LocalSQlite();
-    ~LocalSQlite();
+    LocalSQLite(void *logger = nullptr);
+    ~LocalSQLite();
 
     // Common
     bool close();
@@ -51,12 +52,16 @@ protected:
     void setLastError(char *error);
     char *last_error = NULL;
     bool is_ok = true;
+
+private:
+    // Logger
+    Logging::Logger *log;
 };
 
 // C functions definition
 extern "C"
 {
-    void SHARED_EXPORT *load();
+    void SHARED_EXPORT *load(void *logger);
     void SHARED_EXPORT unload(void *ptr);
     unsigned int SHARED_EXPORT getType();
     bool SHARED_EXPORT getPluginName(char *name, unsigned long long buffersize);

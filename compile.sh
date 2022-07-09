@@ -21,11 +21,13 @@ g++ \
   -g \
   -Iinclude \
   -Ithirdparty/popstationmdg/src/plugins/ \
+  -Ithirdparty/popstationmdg/src/logger/ \
   -Ithirdparty/sqlite/ \
   \
   -std=c++17 -fPIC -DBUILD_LIB -shared -static-libgcc -static-libstdc++ -pthread \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
+  thirdparty/popstationmdg/src/logger/Logger.cpp \
   src/local_sqlite_database.cpp \
   \
   build/linux/sqlite3.o \
@@ -67,11 +69,13 @@ x86_64-w64-mingw32-g++ \
   -g \
   -Iinclude \
   -Ithirdparty/popstationmdg/src/plugins/ \
+  -Ithirdparty/popstationmdg/src/logger/ \
   -Ithirdparty/sqlite/ \
   \
   -std=c++17 -fPIC -DBUILD_LIB -shared -static-libgcc -static-libstdc++ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
+  thirdparty/popstationmdg/src/logger/Logger.cpp \
   src/local_sqlite_database.cpp \
   \
   build/windows/sqlite3.o \

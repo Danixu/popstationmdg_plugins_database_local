@@ -17,6 +17,8 @@ Logging::Logger pLogger = Logging::Logger(Logging::LOG_IN_FILE, Logging::LOG_LEV
 
 int main()
 {
+    pLogger.changeLogLevel(Logging::LOG_LEVEL_TRACE);
+
     auto plugins = load_plugins("./", EXT, PTGameDatabase);
     for (auto ph : plugins)
     {
