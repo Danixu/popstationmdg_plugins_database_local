@@ -1,4 +1,4 @@
-#include "local_sqlite_database.hpp"
+#include "local_sqlite_database.h"
 
 namespace PopstationmdgPlugin
 {
@@ -172,8 +172,44 @@ namespace PopstationmdgPlugin
         }
     }
 
+    bool LocalSQLite::setSettings(char *settingsData, unsigned long &settingsSize, unsigned int mode)
+    {
+        return true;
+    }
+
     extern "C"
     {
+        //
+        // Get all the plugin info in json format.
+        //
+        void SHARED_EXPORT getPluginInfo(char *output, unsigned long long &buffersize)
+        {
+            ordered_json pluginInfo = ordered_json::parse(R"""({
+                "info" : {
+                    "name" : "Local SQLite Database",
+                    "version" : "1.0.0",
+                    "type" : )""" + std::to_string(PTGameDatabase) +
+                                                          R"""(
+                }
+            })""");
+
+            std::string settingsDataStr = pluginInfo.dump();
+
+            if (settingsDataStr.size() > buffersize)
+            {
+                fprintf(stderr, "The settings output buffer is not enough.");
+            }
+
+            // Clear the output buffer
+            memset(output, 0, buffersize);
+
+            // Copy the plugin info to the output buffer
+            strncpy_s(output, buffersize, settingsDataStr.c_str(), settingsDataStr.size());
+
+            // Update the exported size
+            buffersize = settingsDataStr.size();
+        }
+
         //
         // Creates a new plugin object in memory and return its address
         //
@@ -188,49 +224,6 @@ namespace PopstationmdgPlugin
         void SHARED_EXPORT unload(void *ptr)
         {
             delete (LocalSQLite *)ptr;
-        }
-
-        //
-        // Get the type of plugin to allow to filter
-        //
-        unsigned int SHARED_EXPORT getType()
-        {
-            return PTGameDatabase;
-        }
-
-        //
-        // Return the plugin name
-        //
-        bool SHARED_EXPORT getPluginName(char *name, unsigned long long buffersize)
-        {
-            // Compatible extensions for the reader/writter. Use pipe "|" between the extension: "*.iso|*.bin"
-            const char pn[] = "Local SQLite Database";
-
-            if (sizeof(pn) > buffersize)
-            {
-                return false;
-            }
-
-            strncpy_s(name, buffersize, pn, sizeof(pn));
-            return true;
-        }
-
-        //
-        // Return the plugin version
-        //
-        bool SHARED_EXPORT getPluginVersion(char *version, unsigned long long buffersize)
-        {
-            // Compatible extensions for the reader/writter. Use pipe "|" between the extension: "*.iso|*.bin"
-            const char pv[] = "0.0.1";
-
-            if (sizeof(pv) > buffersize)
-            {
-                return false;
-            }
-
-            strncpy_s(version, buffersize, pv, sizeof(pv));
-
-            return true;
         }
 
         bool SHARED_EXPORT open(void *handler, char *filename, unsigned int mode, unsigned int threads)
@@ -274,6 +267,13 @@ namespace PopstationmdgPlugin
             LocalSQLite *object = (LocalSQLite *)handler;
 
             object->clearError();
+        }
+
+        bool SHARED_EXPORT setSettings(void *handler, char *settingsData, unsigned long &settingsSize, unsigned int mode = PTGameDatabase)
+        {
+            LocalSQLite *object = (LocalSQLite *)handler;
+
+            return object->setSettings(settingsData, settingsSize, mode);
         }
     }
 }

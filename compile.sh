@@ -20,8 +20,9 @@ gcc -Ithirdparty/sqlite/ -fPIC -c thirdparty/sqlite/sqlite3.c -o build/linux/sql
 g++ \
   -g \
   -Iinclude \
-  -Ithirdparty/popstationmdg/src/plugins/ \
-  -Ithirdparty/sqlite/ \
+  -Ithirdparty \
+  -Ithirdparty/popstationmdg/include/ \
+  -Ithirdparty/popstationmdg/thirdparty/ \
   \
   -std=c++17 -fPIC -DBUILD_LIB -shared -static-libgcc -static-libstdc++ -pthread \
   \
@@ -37,12 +38,11 @@ echo -e "\tCompiling the Test Program"
 g++ \
   -g \
   -Iinclude \
-  -Ithirdparty/popstationmdg/src/plugins/ \
-  -Ithirdparty/popstationmdg/src/logger/ \
-  -Ithirdparty/sqlite/ \
+  -Ithirdparty \
+  -Ithirdparty/popstationmdg/include/ \
+  -Ithirdparty/popstationmdg/thirdparty/ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
-  thirdparty/popstationmdg/src/logger/Logger.cpp \
   thirdparty/popstationmdg/src/plugins/plugin_handler.cpp \
   src/test.cpp \
   \
@@ -56,7 +56,6 @@ cp data/test.db bin/linux/local_sqlite_database.db
 ###################
 # Windows version #
 ###################
-
 echo "Compiling the Windows version"
 # Compile the library
 echo -e "\tCompiling the Library"
@@ -66,8 +65,9 @@ x86_64-w64-mingw32-gcc -Ithirdparty/sqlite/ -fPIC -c thirdparty/sqlite/sqlite3.c
 x86_64-w64-mingw32-g++ \
   -g \
   -Iinclude \
-  -Ithirdparty/popstationmdg/src/plugins/ \
-  -Ithirdparty/sqlite/ \
+  -Ithirdparty \
+  -Ithirdparty/popstationmdg/include/ \
+  -Ithirdparty/popstationmdg/thirdparty/ \
   \
   -std=c++17 -fPIC -DBUILD_LIB -shared -static-libgcc -static-libstdc++ \
   \
@@ -80,19 +80,18 @@ x86_64-w64-mingw32-g++ \
 
 echo -e "\tCompiling the Test Program"
 # Test Program
-x86_64-w64-mingw32-g++ \
+x86_64-w64-mingw32-g++-posix \
   -g \
   -Iinclude \
-  -Ithirdparty/popstationmdg/src/plugins/ \
-  -Ithirdparty/popstationmdg/src/logger/ \
-  -Ithirdparty/sqlite/ \
+  -Ithirdparty \
+  -Ithirdparty/popstationmdg/include/ \
+  -Ithirdparty/popstationmdg/thirdparty/ \
   \
   thirdparty/popstationmdg/src/plugins/export.cpp \
-  thirdparty/popstationmdg/src/logger/Logger.cpp \
   thirdparty/popstationmdg/src/plugins/plugin_handler.cpp \
   src/test.cpp \
   \
-  -static-libgcc -static-libstdc++ -std=c++17 \
+  -static-libgcc -static-libstdc++ -std=c++17 --static \
   \
   -o bin/windows/test.exe
 cp data/test.db bin/windows/local_sqlite_database.db

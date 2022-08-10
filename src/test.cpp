@@ -5,7 +5,7 @@
  */
 
 #include <vector>
-#include "plugin_handler.hpp"
+#include "plugins/plugin_handler.h"
 
 #ifdef _WIN32
 #define EXT ".dll"
@@ -13,12 +13,8 @@
 #define EXT ".so"
 #endif
 
-Logging::Logger pLogger = Logging::Logger(Logging::LOG_IN_FILE, Logging::LOG_LEVEL_WARNING, std::string("./test_database.log"));
-
 int main()
 {
-    pLogger.changeLogLevel(Logging::LOG_LEVEL_TRACE);
-
     auto plugins = load_plugins("./", EXT, PTGameDatabase);
     for (auto ph : plugins)
     {

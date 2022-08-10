@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/thirdparty/sqlite/*",
-                "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+                "${workspaceFolder}/thirdparty/popstationmdg/thirdparty/*",
+                "${workspaceFolder}/thirdparty/popstationmdg/include/*"
             ],
             "defines": [
                 "__WXOSX_COCOA__",
@@ -24,7 +25,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/thirdparty/sqlite/*",
-                "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+                "${workspaceFolder}/thirdparty/popstationmdg/thirdparty/*",
+                "${workspaceFolder}/thirdparty/popstationmdg/include/*"
             ],
             "defines": [
                 "__WXMSW__",
@@ -42,7 +44,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/thirdparty/sqlite/*",
-                "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+                "${workspaceFolder}/thirdparty/popstationmdg/thirdparty/*",
+                "${workspaceFolder}/thirdparty/popstationmdg/include/*"
             ],
             "defines": [
                 "__WXGTK__"
@@ -56,8 +59,9 @@
             "browse": {
                 "path": [
                     "${workspaceFolder}/include/*",
-                    "${workspaceFolder}/thirdparty/sqlite/*",
-                    "${workspaceFolder}/thirdparty/popstationmdg/src/plugins/*"
+                    "${workspaceFolder}/thirdparty/*",
+                    "${workspaceFolder}/thirdparty/popstationmdg/thirdparty/*",
+                    "${workspaceFolder}/thirdparty/popstationmdg/include/*"
                     
                 ],
                 "limitSymbolsToIncludedHeaders": true
